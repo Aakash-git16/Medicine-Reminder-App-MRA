@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRA - Medicine Reminder App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .screen {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .nav-link-active {
+            color: #ffffff;
+            background-color: #2563eb;
+        }
+        .alarm-ringing {
+            animation: pulse 1s infinite;
+            border-color: #ef4444 !important;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block -mt-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+                MRA
+            </a>
+            <div class="hidden md:flex space-x-2">
+                <a href="#home" class="nav-link nav-link-active px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-blue-500 hover:text-white transition-colors" onclick="navigate('homeScreen', this)">Home</a>
+                <a href="#dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-blue-500 hover:text-white transition-colors" onclick="navigate('dashboardScreen', this)">Dashboard</a>
+                <a href="#add" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-blue-500 hover:text-white transition-colors" onclick="navigate('addScreen', this)">Add Medicine</a>
+                <a href="#history" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-blue-500 hover:text-white transition-colors" onclick="navigate('historyScreen', this)">History</a>
+            </div>
+            <div id="auth-container">
+                <button onclick="openLoginModal()" class="hidden md:block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-semibold">
+                    Login / Sign Up
+                </button>
+            </div>
+            <div class="md:hidden">
+                <button onclick="toggleMobileMenu()" class="text-gray-800 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden px-2 pt-2 pb-3 space-y-1">
+             <a href="#home" class="block nav-link-mobile nav-link-active px-3 py-2 rounded-md text-base font-medium" onclick="navigate('homeScreen', this)">Home</a>
+             <a href="#dashboard" class="block nav-link-mobile px-3 py-2 rounded-md text-base font-medium" onclick="navigate('dashboardScreen', this)">Dashboard</a>
+             <a href="#add" class="block nav-link-mobile px-3 py-2 rounded-md text-base font-medium" onclick="navigate('addScreen', this)">Add Medicine</a>
+             <a href="#history" class="block nav-link-mobile px-3 py-2 rounded-md text-base font-medium" onclick="navigate('historyScreen', this)">History</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+        <div id="homeScreen" class="screen">
+            <section class="text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
+                    Your Health, <span class="text-blue-600">On Schedule.</span>
+                </h1>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    MRA is a smart medicine reminder app that helps you stay on top of your medication schedule. Never miss a dose again with intelligent tracking and timely alerts.
+                </p>
+                <button class="mt-8 bg-blue-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-blue-700 transition-transform hover:scale-105" onclick="navigate('dashboardScreen', document.querySelector('a[href=\'#dashboard\']'))">
+                    Go to Dashboard
+                </button>
+            </section>
+
+            <section class="mt-16 md:mt-24">
+                <h2 class="text-3xl font-bold text-center text-gray-900">Why MRA is for You</h2>
+                <div class="mt-12 grid md:grid-cols-3 gap-10">
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+                        <div class="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-bold">Smart Reminders</h3>
+                        <p class="mt-2 text-gray-600">Add medicine details, timings, and duration. MRA takes care of reminding you on time, every time.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+                        <div class="bg-green-100 text-green-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-bold">Track Your Progress</h3>
+                        <p class="mt-2 text-gray-600">Mark doses as 'Taken' or 'Missed' and view your adherence history to stay accountable for your health.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+                        <div class="bg-purple-100 text-purple-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h3 class="mt-5 text-xl font-bold">Clean & Simple UI</h3>
+                        <p class="mt-2 text-gray-600">A clean, mobile-friendly interface designed to be intuitive and easy to use for people of all ages.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="dashboardScreen" class="screen hidden">
+             <h2 id="dashboard-heading" class="text-3xl font-bold text-gray-900 mb-2">Today's Schedule</h2>
+             <p class="text-gray-600 mb-8">Welcome back! Here are your reminders for today.</p>
+             <div id="medicine-list" class="space-y-4">
+             </div>
+        </div>
+
+        <div id="addScreen" class="screen hidden">
+             <h2 class="text-3xl font-bold text-gray-900 mb-8">Add a New Reminder</h2>
+             <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+                <form id="add-medicine-form" class="space-y-6">
+                    <div>
+                        <label for="medName" class="block text-sm font-medium text-gray-700">Medicine Name</label>
+                        <input type="text" id="medName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Paracetamol" required>
+                    </div>
+                    <div>
+                        <label for="dosage" class="block text-sm font-medium text-gray-700">Dosage</label>
+                        <input type="text" id="dosage" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 500mg or 1 Tablet" required>
+                    </div>
+                    <div>
+                        <label for="time" class="block text-sm font-medium text-gray-700">Time</label>
+                        <input type="time" id="time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                     <div>
+                        <label for="duration" class="block text-sm font-medium text-gray-700">Duration (in days)</label>
+                        <input type="number" id="duration" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 14" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg mt-6 hover:bg-blue-700 transition-colors text-lg">
+                        Save Reminder
+                    </button>
+                </form>
+             </div>
+             <div id="success-message" class="hidden mt-6 max-w-xl mx-auto bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md">
+                <p>Reminder saved successfully!</p>
+            </div>
+        </div>
+
+        <div id="historyScreen" class="screen hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Medication History</h2>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div id="history-content">
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <p class="text-gray-500">Loading your medication history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-4 text-center">
+            <p>&copy; 2025 MRA - Medicine Reminder App. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            
+            <div id="login-tab" class="login-tab">
+                <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">Login to MRA</h3>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="login-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="login-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="••••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors text-base">
+                        Login
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Don't have an account? 
+                    <button onclick="showSignup()" class="text-blue-600 hover:text-blue-700 font-medium">Sign up</button>
+                </p>
+            </div>
+
+            <div id="signup-tab" class="login-tab hidden">
+                <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">Create Account</h3>
+                <form id="signup-form" class="space-y-4">
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="signup-name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="John Doe" required>
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="signup-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="signup-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="••••••••••" required minlength="6">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors text-base">
+                        Create Account
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Already have an account? 
+                    <button onclick="showLogin()" class="text-blue-600 hover:text-blue-700 font-medium">Login</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="alarm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full text-center alarm-ringing">
+            <div class="text-6xl mb-4">⏰</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Medicine Reminder!</h3>
+            <p class="text-lg text-gray-700 mb-2" id="alarm-medicine-name">Paracetamol</p>
+            <p class="text-gray-600 mb-6" id="alarm-time">Scheduled for 09:00 AM</p>
+            <button onclick="stopAlarm()" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition-colors text-lg">
+                Stop Alarm
+            </button>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        const screens = document.querySelectorAll('.screen');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const mobileNavLinks = document.querySelectorAll('.nav-link-mobile');
+        const medicineList = document.getElementById('medicine-list');
+        const form = document.getElementById('add-medicine-form');
+        const successMessage = document.getElementById('success-message');
+        const loginModal = document.getElementById('login-modal');
+        const dashboardHeading = document.getElementById('dashboard-heading');
+        const authContainer = document.getElementById('auth-container');
+        const alarmModal = document.getElementById('alarm-modal');
+        const alarmMedicineName = document.getElementById('alarm-medicine-name');
+        const alarmTime = document.getElementById('alarm-time');
+
+        let medicineData = [];
+        let alarmInterval = null;
+        let currentAlarm = null;
+        let alarmAudio = null;
+
+        // Check if user is logged in on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (isLoggedIn()) {
+                const user = getCurrentUser();
+                updateUIForUser(user);
+                await loadMedicines();
+            } else {
+                showLoginButton();
+            }
+            
+            navigate('homeScreen', document.querySelector('a[href="#home"]'));
+            
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+        });
+
+        // --- NAVIGATION ---
+        function navigate(screenId, clickedLink) {
+            screens.forEach(screen => screen.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+
+            // Load history when navigating to history screen
+            if (screenId === 'historyScreen' && isLoggedIn()) {
+                loadHistory();
+            }
+
+            const allLinks = [...navLinks, ...mobileNavLinks];
+            allLinks.forEach(link => link.classList.remove('nav-link-active'));
+
+            if (clickedLink.href) {
+                const target = clickedLink.href.split('#')[1];
+                document.querySelector(`a[href="#${target}"]`).classList.add('nav-link-active');
+                document.querySelector(`#mobile-menu a[href="#${target}"]`).classList.add('nav-link-active');
+            }
+            
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+        
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // --- AUTHENTICATION ---
+        function openLoginModal() {
+            showLogin();
+            loginModal.classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            loginModal.classList.add('hidden');
+        }
+
+        function showSignup() {
+            document.getElementById('login-tab').classList.add('hidden');
+            document.getElementById('signup-tab').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('signup-tab').classList.add('hidden');
+            document.getElementById('login-tab').classList.remove('hidden');
+        }
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (email && password) {
+                const result = await MedicineAPI.login({ email, password });
+                
+                if (result.token) {
+                    const user = getCurrentUser();
+                    updateUIForUser(user);
+                    await loadMedicines();
+                    closeLoginModal();
+                    document.getElementById('login-form').reset();
+                } else {
+                    alert(result.message || 'Login failed. Please check your credentials.');
+                }
+            }
+        });
+
+        // Signup form handler  
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (name && email && password) {
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long');
+                    return;
+                }
+
+                const result = await MedicineAPI.register({ name, email, password });
+                
+                if (result.token) {
+                    const user = getCurrentUser();
+                    updateUIForUser(user);
+                    await loadMedicines();
+                    closeLoginModal();
+                    document.getElementById('signup-form').reset();
+                    alert('Account created successfully! Welcome to MRA!');
+                } else {
+                    alert(result.message || 'Signup failed. Please try again.');
+                }
+            }
+        });
+
+        function updateUIForUser(user) {
+            dashboardHeading.textContent = `Today's Schedule for ${user.name}`;
+            authContainer.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <span class="hidden md:block text-sm font-medium text-gray-700">Welcome, ${user.name}</span>
+                    <button onclick="logout()" class="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-sm">
+                        Logout
+                    </button>
+                </div>
+            `;
+        }
+
+        function showLoginButton() {
+            authContainer.innerHTML = `
+                <button onclick="openLoginModal()" class="hidden md:block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-semibold">
+                    Login / Sign Up
+                </button>
+            `;
+        }
+
+        function logout() {
+            MedicineAPI.logout();
+            medicineData = [];
+            medicineList.innerHTML = '';
+            dashboardHeading.textContent = `Today's Schedule`;
+            showLoginButton();
+            navigate('homeScreen', document.querySelector('a[href="#home"]'));
+        }
+
+        // --- MEDICINES ---
+        async function loadMedicines() {
+            const result = await MedicineAPI.getMedicines();
+            
+            if (Array.isArray(result)) {
+                medicineData = result;
+                renderMedicines();
+            } else if (result.message === 'Not authenticated') {
+                showLoginButton();
+            } else {
+                console.error('Error loading medicines:', result.message);
+            }
+        }
+
+        async function addMedicine(medicineData) {
+            const result = await MedicineAPI.addMedicine(medicineData);
+            
+            if (result._id) {
+                await loadMedicines();
+                return true;
+            } else {
+                console.error('Error adding medicine:', result.message);
+                return false;
+            }
+        }
+
+        async function updateMedicineStatus(medicineId, status) {
+            const result = await MedicineAPI.updateMedicineStatus(medicineId, status);
+            
+            if (result._id) {
+                await loadMedicines();
+                return true;
+            } else {
+                console.error('Error updating medicine:', result.message);
+                return false;
+            }
+        }
+
+        // --- HISTORY ---
+        async function loadHistory() {
+            const result = await MedicineAPI.getHistory();
+            
+            const historyContent = document.getElementById('history-content');
+            
+            if (Array.isArray(result)) {
+                if (result.length === 0) {
+                    historyContent.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="text-gray-400 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">No History Yet</h3>
+                            <p class="text-gray-500">Your medication history will appear here once you start taking medicines.</p>
+                        </div>
+                    `;
+                } else {
+                    historyContent.innerHTML = `
+                        <div class="flow-root">
+                            <ul role="list" class="-mb-8">
+                                ${result.map((item, index) => `
+                                    <li>
+                                        <div class="relative pb-8">
+                                            ${index < result.length - 1 ? '<span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>' : ''}
+                                            <div class="relative flex space-x-3 items-start">
+                                                <div>
+                                                    <span class="h-8 w-8 rounded-full ${item.status === 'taken' ? 'bg-green-500' : 'bg-red-500'} flex items-center justify-center ring-8 ring-white">
+                                                        ${item.status === 'taken' ? 
+                                                            '<svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>' :
+                                                            '<svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.693a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>'
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div class="min-w-0 flex-1 pt-1.5">
+                                                    <p class="text-sm text-gray-500">
+                                                        ${item.status === 'taken' ? 'Taken' : 'Missed'} at 
+                                                        <time>${new Date(item.actionTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</time>
+                                                    </p>
+                                                    <p class="font-medium text-gray-900">${item.name} (${item.dosage})</p>
+                                                    <p class="text-sm text-gray-500">${new Date(item.actionTime).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+            } else {
+                historyContent.innerHTML = `<p class="text-center text-red-500 py-8">Error loading history: ${result.message}</p>`;
+            }
+        }
+
+        // --- ALARM SYSTEM ---
+        function formatTime(time) {
+            let [hour, minute] = time.split(':');
+            let ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12;
+            hour = hour ? hour : 12;
+            return `${hour}:${minute} ${ampm}`;
+        }
+
+        function setAlarm(medicine) {
+            const [alarmHour, alarmMinute] = medicine.time.split(':');
+            const now = new Date();
+            const alarmTime = new Date();
+            alarmTime.setHours(parseInt(alarmHour), parseInt(alarmMinute), 0, 0);
+
+            if (alarmTime < now) {
+                alarmTime.setDate(alarmTime.getDate() + 1);
+            }
+
+            const timeUntilAlarm = alarmTime.getTime() - now.getTime();
+
+            setTimeout(() => {
+                triggerAlarm(medicine);
+            }, timeUntilAlarm);
+
+            console.log(`Alarm set for ${medicine.name} at ${medicine.time}`);
+        }
+
+        function triggerAlarm(medicine) {
+            currentAlarm = medicine;
+            alarmMedicineName.textContent = medicine.name;
+            alarmTime.textContent = `Scheduled for ${formatTime(medicine.time)}`;
+            alarmModal.classList.remove('hidden');
+            
+            playAlarmSound();
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Medicine Reminder!', {
+                    body: `Time to take ${medicine.name}`,
+                    icon: '/favicon.ico'
+                });
+            }
+        }
+
+        function playAlarmSound() {
+            stopAlarmSound();
+            
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 800;
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            
+            alarmAudio = { context, oscillator, gainNode };
+            
+            alarmInterval = setInterval(() => {
+                gainNode.gain.value = 0.3;
+                setTimeout(() => {
+                    if (gainNode) gainNode.gain.value = 0.1;
+                }, 500);
+            }, 1000);
+        }
+
+        function stopAlarmSound() {
+            if (alarmAudio) {
+                try {
+                    clearInterval(alarmInterval);
+                    alarmAudio.oscillator.stop();
+                    alarmAudio.context.close();
+                    alarmAudio = null;
+                } catch (e) {
+                    console.log('Alarm stopped');
+                }
+            }
+        }
+
+        function stopAlarm() {
+            alarmModal.classList.add('hidden');
+            stopAlarmSound();
+            
+            if (currentAlarm) {
+                updateMedicineStatus(currentAlarm._id, 'taken');
+                currentAlarm = null;
+            }
+        }
+
+        // --- UI RENDERING ---
+        function createMedicineCard(med) {
+            const card = document.createElement('div');
+            card.className = `medicine-card bg-white p-5 rounded-xl shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-l-4 transition-colors ${med.status === 'taken' ? 'border-green-500' : 'border-blue-500'}`;
+            card.dataset.id = med._id;
+
+            let statusHTML;
+            if (med.status === 'taken') {
+                statusHTML = `<div class="w-full md:w-auto text-center px-4 py-2 rounded-md bg-green-100 text-green-700 font-semibold text-sm">✓ Taken</div>`;
+            } else {
+                statusHTML = `<button class="mark-taken-btn w-full md:w-auto bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">Mark as Taken</button>`;
+            }
+
+            card.innerHTML = `
+                <div class="flex items-center gap-4">
+                     <div class="bg-blue-100 text-blue-600 rounded-lg p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V4m0 16v-2M8 8l1.414-1.414M14.586 14.586L16 16m-1.414-8.414L16 6m-8.414 1.414L6 6m1.414 8.414L6 16" /></svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-lg text-gray-900">${med.name}</p>
+                        <p class="text-sm text-gray-500">Dosage: ${med.dosage}</p>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
+                    <div class="text-center bg-gray-100 px-4 py-2 rounded-md">
+                        <p class="font-semibold text-lg text-blue-600">${formatTime(med.time)}</p>
+                    </div>
+                    ${statusHTML}
+                </div>
+            `;
+
+            if (med.status !== 'taken') {
+                 card.querySelector('.mark-taken-btn').addEventListener('click', async (e) => {
+                    const cardElement = e.target.closest('.medicine-card');
+                    const medId = cardElement.dataset.id;
+                    await updateMedicineStatus(medId, 'taken');
+                });
+            }
+            return card;
+        }
+
+        function renderMedicines() {
+            medicineList.innerHTML = '';
+            const sortedMeds = medicineData.sort((a,b) => a.time.localeCompare(b.time));
+            sortedMeds.forEach(med => {
+                medicineList.appendChild(createMedicineCard(med));
+                if (med.status === 'upcoming') {
+                    setAlarm(med);
+                }
+            });
+        }
+        
+        // --- FORM HANDLING ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!isLoggedIn()) {
+                alert('Please login first');
+                openLoginModal();
+                return;
+            }
+            
+            const medicineData = {
+                name: document.getElementById('medName').value,
+                dosage: document.getElementById('dosage').value,
+                time: document.getElementById('time').value,
+                duration: parseInt(document.getElementById('duration').value)
+            };
+
+            const success = await addMedicine(medicineData);
+            
+            if (success) {
+                form.reset();
+                successMessage.classList.remove('hidden');
+                setTimeout(() => successMessage.classList.add('hidden'), 3000);
+                navigate('dashboardScreen', document.querySelector('a[href="#dashboard"]'));
+            } else {
+                alert('Failed to save medicine');
+            }
+        });
+    </script>
+</body>
+</html>
