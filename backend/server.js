@@ -5,14 +5,13 @@ const path = require('path');
 
 const app = express();
 
-// CORS
+// CORS - allow all origins
 app.use(cors());
+
+// Parse JSON
 app.use(express.json());
 
-// Serve static files from frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// API Routes
+// API Routes - MUST COME BEFORE STATIC FILES
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/medicines', require('./routes/medicines'));
 
@@ -21,16 +20,22 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Medicine Reminder API is working!' });
 });
 
-// Serve frontend for all routes (FIXED - no wildcard)
+// Serve static files from frontend - AFTER API routes
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Serve frontend for root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/medicine-reminder';
+const MONGODB_URI = process.env.MONGODB_URI;
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => {
+    console.log('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
