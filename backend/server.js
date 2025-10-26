@@ -7,7 +7,6 @@ const app = express();
 
 // CORS
 app.use(cors());
-
 app.use(express.json());
 
 // Serve static files from frontend
@@ -22,8 +21,8 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Medicine Reminder API is working!' });
 });
 
-// Serve frontend for all other routes
-app.get('/*', (req, res) => {
+// Serve frontend for all routes (FIXED - no wildcard)
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
