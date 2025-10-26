@@ -1,25 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
-// FIX CORS - Allow Live Server origins
+// CORS for production
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:8080'],
+    origin: ['https://your-frontend.netlify.app', 'http://localhost:3000', 'http://127.0.0.1:5500'],
     credentials: true
 }));
 
-// Middleware
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/medicines', require('./routes/medicines'));
 
-// Basic route to test
-app.get('/', (req, res) => {
+// Basic route
+app.get('/api', (req, res) => {
     res.json({ message: 'Medicine Reminder API is working!' });
 });
 
