@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://mra-backend.onrender.com/api';
 
 // Global variables to store auth data
 let authToken = localStorage.getItem('authToken');
