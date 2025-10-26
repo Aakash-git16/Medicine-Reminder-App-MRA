@@ -2,15 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 
 // CORS
-app.use(cors({
-    origin: ['https://medicine-reminder-app-mra-final.onrender.com', 'http://localhost:3000', 'http://127.0.0.1:5500'],
-    credentials: true
-}));
+app.use(cors());
 
 app.use(express.json());
 
@@ -26,13 +22,14 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Medicine Reminder API is working!' });
 });
 
-// Serve frontend for all other routes (FIXED)
+// Serve frontend for all other routes
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/medicine-reminder')
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/medicine-reminder';
+mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
