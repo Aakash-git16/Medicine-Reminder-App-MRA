@@ -26,8 +26,8 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Medicine Reminder API is working!' });
 });
 
-// Serve frontend for all other routes
-app.get('*', (req, res) => {
+// Serve frontend for all other routes (FIXED)
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
